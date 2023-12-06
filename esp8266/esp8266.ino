@@ -93,6 +93,7 @@ FirebaseJson firebaseJsonRiwayat;
 String indexChild = "";
 String tanggalPakan = "";
 String beratPakanGlobal = "";
+String pengulanganPakanGlobal = "";
 void insertRiwayatPakan(String waktuPakan) {
 
     // Menyiapkan data untuk dikirim
@@ -111,7 +112,7 @@ void insertRiwayatPakan(String waktuPakan) {
         }
     } 
 }
-bool compareTime(String jsonTime,String tanggal,String indexRef) 
+bool compareTime(String jsonTime,String tanggal,String indexRef,String pengulangan) 
 {
     tmElements_t tm;
     int _hour, _minute;
@@ -130,7 +131,7 @@ bool compareTime(String jsonTime,String tanggal,String indexRef)
     // Serial.println("jam sekarang : " + jamSekarang);
     // Serial.println("jam jadwal makanan : " + jadwalMakan);
   //  Serial.print("feedingoccured : ");
-    Serial.println(feedingOccurred);
+   // Serial.println(feedingOccurred);
     if (jamSekarang == jadwalMakan && !feedingOccurred)
     {
         feedingOccurred = true;
@@ -150,6 +151,9 @@ float waktuPkn = jumlahPutaran / 100;
           pakan(jumlahPutaran);
           indexChild = indexRef;
           beratPakanGlobal = String(beratPakan);
+          pengulanganPakanGlobal = pengulangan;
+  //           Serial.print("Pakan Pengulangan");
+  // Serial.println(pengulanganPakanGlobal);
           tanggalPakan = tanggal;
         //  Serial.println(indexRef);
         }
@@ -163,12 +167,14 @@ float waktuPkn = jumlahPutaran / 100;
         {
                 Serial.println("1s:0");
                     insertRiwayatPakan(jamSekarang);
-               
-                    Serial.println(indexChild);
+                    // Serial.println(indexChild);
                 
     String path = "/konfigurasi_pakan/konfigurasi_pakan/" + indexChild;
-  //  Serial.println(path);
-                    deleteItem(path);
+  // Serial.print("Pakan Pengulangan");
+  // Serial.println(pengulanganPakanGlobal);
+  if(pengulanganPakanGlobal == "Satu Kali"){
+                deleteItem(path);
+  } 
                     
             feedingOccurred = false;
             // Serial.println("Feeding time ended, delay elapsed");
@@ -231,10 +237,12 @@ void loop()
             waktuPakan = jsonData.to<String>();
             deserializeJson(doc, waktuPakan);
             beratPakan = doc["berat_pakan"]; // Use the global variable
+
             String pengulangan = doc["pengulangan"].as<String>();
             String tanggal = doc["tanggal"].as<String>();
             String waktuPakan1 = doc["waktu_pakan"].as<String>();
             String indexAsString = String(i);
+
         //           Serial.print("Index: ");
         // Serial.println(indexAsString);
         // Serial.print("Pengulangan: ");
@@ -243,7 +251,7 @@ void loop()
         // Serial.println(tanggal);
         // Serial.print("Waktu Pakan: ");
         // Serial.println(waktuPakan1);
-            if (compareTime(waktuPakan1,tanggal,indexAsString))
+            if (compareTime(waktuPakan1,tanggal,indexAsString,pengulangan))
             {
             
             }
