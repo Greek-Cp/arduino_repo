@@ -53,6 +53,7 @@ void setup()
   Serial.begin(115200);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Connecting to Wi-Fi");
+  feedingOccurred = false;
   while (WiFi.status() != WL_CONNECTED)
   {
     Serial.print(".");
@@ -84,7 +85,7 @@ void setup()
 
 FirebaseJson firebaseJson;
 unsigned long lastTime = 0;
-const long interval = 1000 ;
+const long interval = 5000 ;
 String markTime;
 FirebaseJson firebaseJsonRiwayat;
 
@@ -126,9 +127,10 @@ bool compareTime(String jsonTime,String tanggal,String indexRef)
 
     String jamSekarang = String(jam) + ":" + String(menit);
     String jadwalMakan = String(_hour) + ":" + String(_minute);
-    Serial.println("jam sekarang : " + jamSekarang);
-    Serial.println("jam jadwal makanan : " + jadwalMakan);
-
+    // Serial.println("jam sekarang : " + jamSekarang);
+    // Serial.println("jam jadwal makanan : " + jadwalMakan);
+  //  Serial.print("feedingoccured : ");
+    Serial.println(feedingOccurred);
     if (jamSekarang == jadwalMakan && !feedingOccurred)
     {
         feedingOccurred = true;
@@ -137,12 +139,11 @@ bool compareTime(String jsonTime,String tanggal,String indexRef)
         // Serial.println("Feeding time started");
        float gramPerPutaran = 0.138; 
 float jumlahPutaran = beratPakan / gramPerPutaran;
-Serial.print("Berat pakan : ");
-Serial.println(beratPakan);
-Serial.print("jumlah putaran : ");
-Serial.println(jumlahPutaran);
+// Serial.print("Berat pakan : ");
+// Serial.println(beratPakan);
+// Serial.print("jumlah putaran : ");
+// Serial.println(jumlahPutaran);
 float waktuPkn = jumlahPutaran / 100;
-
         feedingDelay = waktuPkn * 20;
         indexCallPakanFunction++;
         if(indexCallPakanFunction == 1){
@@ -150,7 +151,7 @@ float waktuPkn = jumlahPutaran / 100;
           indexChild = indexRef;
           beratPakanGlobal = String(beratPakan);
           tanggalPakan = tanggal;
-         Serial.println(indexRef);
+        //  Serial.println(indexRef);
         }
 
         return true;
@@ -166,7 +167,7 @@ float waktuPkn = jumlahPutaran / 100;
                     Serial.println(indexChild);
                 
     String path = "/konfigurasi_pakan/konfigurasi_pakan/" + indexChild;
-    Serial.println(path);
+  //  Serial.println(path);
                     deleteItem(path);
                     
             feedingOccurred = false;
@@ -198,10 +199,10 @@ float waktuPkn = jumlahPutaran / 100;
 void deleteItem(String path) {
  
     if (Firebase.RTDB.deleteNode(&fbdo, path)) {
-        Serial.println("Item deleted successfully. with index");
+//        Serial.println("Item deleted successfully. with index");
         
     } else {
-        Serial.println("Failed to delete item: " + fbdo.errorReason());
+  //      Serial.println("Failed to delete item: " + fbdo.errorReason());
     }
 }
 void loop()
@@ -234,14 +235,14 @@ void loop()
             String tanggal = doc["tanggal"].as<String>();
             String waktuPakan1 = doc["waktu_pakan"].as<String>();
             String indexAsString = String(i);
-                  Serial.print("Index: ");
-        Serial.println(indexAsString);
-        Serial.print("Pengulangan: ");
-        Serial.println(pengulangan);
-        Serial.print("Tanggal: ");
-        Serial.println(tanggal);
-        Serial.print("Waktu Pakan: ");
-        Serial.println(waktuPakan1);
+        //           Serial.print("Index: ");
+        // Serial.println(indexAsString);
+        // Serial.print("Pengulangan: ");
+        // Serial.println(pengulangan);
+        // Serial.print("Tanggal: ");
+        // Serial.println(tanggal);
+        // Serial.print("Waktu Pakan: ");
+        // Serial.println(waktuPakan1);
             if (compareTime(waktuPakan1,tanggal,indexAsString))
             {
             
@@ -251,7 +252,7 @@ void loop()
       }
       else
       {
-      Serial.println("Firebase Get Array Error: " + fbdo.errorReason());
+      // Serial.println("Firebase Get Array Error: " + fbdo.errorReason());
       }
     }
   }
@@ -290,9 +291,9 @@ void loop()
       lastFirebaseUpdate = millis();
   
     String childKey = "datariwayat" + String(millis());
-      if (!Firebase.RTDB.setJSON(&fbdo, "/datariwayat/" + childKey, &firebaseJsonRiwayat)) {
-            // Handle error
-        }
+      // if (!Firebase.RTDB.setJSON(&fbdo, "/datariwayat/" + childKey, &firebaseJsonRiwayat)) {
+      //       // Handle error
+      //   }
       if (!Firebase.RTDB.setJSON(&fbdo, "/datafirebase", &firebaseJson))
       {
         // Handle error
